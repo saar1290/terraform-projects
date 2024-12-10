@@ -1,0 +1,5 @@
+variable "public" {
+}
+
+variable "private" {
+}

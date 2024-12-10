@@ -1,0 +1,5 @@
+variable "loadBalancerIP" {
+}
+
+variable "loadBalancerSubnetName" {
+}

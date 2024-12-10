@@ -1,0 +1,70 @@
+terraform {
+  required_providers {
+    kubectl = {
+      source = "gavinbunney/kubectl"
+    }
+  }
+}
+
+resource "kubectl_manifest" "storageclass_default_patch" {
+  yaml_body = yamlencode({
+    apiVersion = "storage.k8s.io/v1"
+    kind       = "StorageClass"
+    metadata = {
+      annotations = {
+        "storageclass.kubernetes.io/is-default-class" = "false"
+      }
+      labels = {
+        "addonmanager.kubernetes.io/mode" = "EnsureExists"
+        "kubernetes.io/cluster-service"   = "true"
+      }
+      name = "default"
+    }
+    parameters = {
+      "skuname" = "StandardSSD_LRS"
+    }
+    provisioner          = "disk.csi.azure.com"
+    reclaimPolicy        = "Delete"
+    volumeBindingMode    = "WaitForFirstConsumer"
+    allowVolumeExpansion = true
+  })
+  force_new       = true
+  force_conflicts = true
+
+  depends_on = [
+    azurerm_kubernetes_cluster.aks,
+    azurerm_management_lock.aks_lock
+  ]
+}
+
+resource "kubernetes_storage_class_v1" "storageclass_zonal_redundant" {
+  metadata {
+    name = "default-zrs"
+    annotations = {
+      "storageclass.kubernetes.io/is-default-class" = "true"
+    }
+    labels = {
+      "addonmanager.kubernetes.io/mode" = "EnsureExists"
+      "kubernetes.io/cluster-service"   = "true"
+    }
+  }
+  storage_provisioner    = "disk.csi.azure.com"
+  reclaim_policy         = "Delete"
+  volume_binding_mode    = "WaitForFirstConsumer"
+  allow_volume_expansion = true
+
+  allowed_topologies {
+    match_label_expressions {
+      key    = "topology.kubernetes.io/zone"
+      values = var.topology_zone_values
+    }
+  }
+
+  parameters = {
+    skuname = "StandardSSD_ZRS"
+  }
+
+  depends_on = [
+    kubectl_manifest.storageclass_default_patch
+  ]
+}

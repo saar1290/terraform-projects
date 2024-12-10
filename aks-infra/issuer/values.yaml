@@ -1,0 +1,32 @@
+installCRDs: true
+nodeSelector:
+  kubernetes.azure.com/mode: system
+tolerations:
+- key: "CriticalAddonsOnly"
+  operator: "Equal"
+  value: "true"
+  effect: "NoSchedule"
+webhook:
+  nodeSelector:
+    kubernetes.azure.com/mode: system
+  tolerations:
+  - key: "CriticalAddonsOnly"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"
+cainjector:
+  nodeSelector:
+    kubernetes.azure.com/mode: system
+  tolerations:
+  - key: "CriticalAddonsOnly"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"
+startupapicheck:
+  nodeSelector:
+    kubernetes.azure.com/mode: system
+  tolerations:
+  - key: "CriticalAddonsOnly"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"

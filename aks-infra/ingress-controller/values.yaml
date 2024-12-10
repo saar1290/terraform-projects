@@ -1,0 +1,9 @@
+controller:
+  nodeSelector: 
+    kubernetes.azure.com/mode: system
+  tolerations:
+  - key: "CriticalAddonsOnly"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"
+  maxUnavailable: 1
